@@ -3,6 +3,7 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 import shutil,os
 from schemas import FileUploadSchema
+import random
 
 
 app=FastAPI()
@@ -42,12 +43,12 @@ def get_user_videos(user:str):
         )
     return {"user":user,"user_videos":os.listdir(file_path)}
 
-@app.get('/file/{user}/{filename}',summary="downloads a stored user video")
-def download_video(filename:str,user:str):
+@app.get('/file/{user}/{video_id}',summary="downloads a stored user video")
+def download_video(video_id:str,user:str):
 
-    file=find_file(name)
+    file=find_file(video_id,user)
     cwd=str(Path.cwd())
-    file_path=f"{cwd}/videos/{file}"
+    file_path=f"{cwd}/videos/{user}/{file}"
 
     if file is not None:
         return FileResponse(path=file_path,media_type='application/octet-stream',filename=file)
@@ -59,7 +60,7 @@ def download_video(filename:str,user:str):
 
 @app.post('/file',summary="uploads video for a user and creates a special directory for the user")
 async def upload_video(user:str,video:UploadFile=File(...)):
-    video_ext=video.filename.split('.').pop()
+    # create a session a session id ?
     # create a path to store the videoes in the server
     path = Path.cwd()/'videos'/user
     try:
@@ -69,8 +70,11 @@ async def upload_video(user:str,video:UploadFile=File(...)):
     else:
         pass
 
+    video_id=str(random.randint(0,10000))
+    video.filename=video_id+'.mp4'
     file_path=f"{path}/{video.filename}"
+
     with open(file_path,"wb") as f:
         shutil.copyfileobj(video.file,f)
-    return {"Uploaded":True,"file_path":file_path}
+    return {"Uploaded":True,"file_path":file_path,"video_id":video_id}
 
