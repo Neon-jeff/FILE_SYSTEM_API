@@ -20,7 +20,7 @@ def find_file(name,user):
     return file
 
 
-@app.get('/',status_code=200)
+@app.get('',status_code=200)
 def check_health():
     return {"health status":"ok"}
 
@@ -40,7 +40,7 @@ def get_user_videos(user:str):
                 "message":"User not found"
             }
         )
-    return {"user_videos":os.listdir(file_path)}
+    return {"user":user,"user_videos":os.listdir(file_path)}
 
 @app.get('/file/{user}/{filename}',summary="downloads a stored user video")
 def download_video(filename:str,user:str):
@@ -69,7 +69,7 @@ async def upload_video(user:str,video:UploadFile=File(...)):
     else:
         pass
 
-    file_path=f"{path}\{video.filename}"
+    file_path=f"{path}/{video.filename}"
     with open(file_path,"wb") as f:
         shutil.copyfileobj(video.file,f)
     return {"Uploaded":True,"file_path":file_path}
