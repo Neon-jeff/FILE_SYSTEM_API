@@ -58,7 +58,7 @@ def download_video(video_id:str,user:str):
         })
 
 
-@app.post('/file',summary="uploads video for a user and creates a special directory for the user")
+@app.post('/file',summary="uploads video for a user, creates a video id and creates a folder or directory for the user")
 async def upload_video(user:str,video:UploadFile=File(...)):
     # create a session a session id ?
     # create a path to store the videoes in the server
